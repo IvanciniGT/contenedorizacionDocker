@@ -46,10 +46,15 @@ $ docker image pull software:version                                        $ do
 
 ## Crear un contenedor
 
-$ docker container create <ARGS> IMAGEN(repo:tag)
+$ docker container create <ARGS> IMAGEN(repo:tag) <COMANDO>
     ARGS:
             --name NOMBRE
-
+            -p     IP-HOST:PUERTO-HOST:PUERTO-CONTENEDOR     Redirecciones de puertos a nivel del host < Exposición de servicios
+                   ******* Es opcional. Su valor por defecto: 0.0.0.0 Todas las IPs del host
+            -v     RUTA-HOST:RUTA-CONTENEDOR        < volumenes
+            -e     VARIABLE-ENTORNO=VALOR
+    COMANDO: Proceso que debe ejecutarse al hacer un docker start, es decir al arrancar el contenedor
+             Por defecto si no pongo nada, se toma el de la imagen
 ## Arrancar un contenedor
 
 $ docker container start (ID o NOMBRE del contenedor)                      $ docker start (ID o NOMBRE del contenedor)    
@@ -78,6 +83,11 @@ $ docker container inspect (ID o NOMBRE)
 
 $ docker exec (ID o NOMBRE) commando que quiero ejecutar
                             -it 
+                            
+## Ver el log de un contenedor
+
+$ docker container logs (ID o NOMBRE) 
+
 # REDES EN DOCKER
 
 $ docket network list

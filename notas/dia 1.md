@@ -58,10 +58,10 @@ Llevamos en el camino de la contenedorización desde hace más de 40 años.
 * Servicios < Servidores
 * Demonios
 * Scripts
-* Comando
+* Comando 
 * Libreria
 -----------------
-- Aplicaciones (Photoshop, Word)
+- Aplicaciones (Photoshop, Word) Software que interactua con un usuario persona física
 - Driver
 - SO
 
