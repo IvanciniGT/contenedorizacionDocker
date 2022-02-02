@@ -58,3 +58,32 @@ Kubernetes:
     Instalar un weblogic nuevo y meterlo en un dominio
     Montar un cluster dentro del weblogicNi sube una app al weblogic
     Ni crea una BBDD dentro del weblogic
+
+
+        
+Dockerfile multistage:
+Es un fichero Dockerfile... que no genera 1 imagen de contenedor desde 1 contenedor....
+                            Genera 1 imagen de conteendor desde muchos conteendores que se van creando para ir haciendo tareas concretas
+                            
+# Docker-compose:
+Es un cliente de dockerd ... otro cliente
+Diferente de docker:
+    - A docker-compose, no le configuramos contenedores a través de argumentos en linea de comandos...
+                        Lo hacemos a traves de ficheros docker-compose.yaml
+    - Docker-compose permite trabajar con conjuntos de contenedores... no con contenedores uno a uno, como hace docker
+
+# YAML 
+
+Lenguaje de marcado de información. equivalente a: xml, json
+
+YAML
+HTML
+ XML
+
+ML= Lenguaje de marcado
+<tag>contenido</tag>
+
+YAML= YAML aint markup language
+YAML orientado a seres humanos, fuertemente inspirado en la sintaxis de PYTHON
+     ofrece mucha mas funcionalidad que JSON... de hecho se ha comido a JSON... en sentido literal
+     Hoy en dia un doc JSON es un doc YAML. JSON -> YAML

@@ -20,7 +20,4 @@ mi-web-service
                 git
                 maven? Si no están... habrá que instalarlas
                 java
-                
-Dockerfile multistage:
-Es un fichero Dockerfile... que no genera 1 imagen de contenedor desde 1 contenedor....
-                            Genera 1 imagen de conteendor desde muchos conteendores que se van creando para ir haciendo tareas concretas
+        

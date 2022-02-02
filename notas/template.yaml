@@ -1,0 +1,100 @@
+# Comentarios
+# Dentro de un fichero YAML, puede haber MUCHOS documentos YAML
+# Cada documento va marcado por la etiqueta: ---
+# Esa etiqueta no se pone en el primer documento
+---
+... # Los puntos significan final de documento (es opcional).
+    # Solo tiene sentido en transmisiones por red de ficheros
+---
+# Un documento YAML es lo que denominamos un NODO
+# Existen dos tipos de nodos:
+# - Escalares
+# - De coleccion
+---
+# Escalares
+---
+# Numeros
+87 # Numeros positivos
+---
+-13 # Negativos
+3.15 # Decimales
+# Este documento sería invalido... tiene dos nodos. Cada uno esta bien per se... pero hay 2.
+---
+# Texto
+H'o"la # amigo
+---
+"H'o\"la # ami\ng\to\\"
+---
+'H''o"la # ami\ng\to\'
+---
+# Sintaxis literal. Mantiene todo
+|4-
+      Hola amigo
+    Cómo "estas"
+    \Bien\'' # Y tu
+    
+    
+---
+# Sintaxis folded. Reemplaza saltos de linea por espacios
+>-
+    Hola amigo
+    Cómo "estas"
+    \Bien\'' # Y tu
+---
+# Valores lógicos:
+True
+#true
+#TRUE
+#False
+#false
+#FALSE
+---
+# EN VERIONES ANTIGUAS DE YAML 1.0 y 1.1
+# Tambien servian.
+# ESTO YA SE HA QUITADO DE YAML 1.2
+#On
+#on
+#Off
+#off
+#yes
+#YES
+#y
+#No
+#NO
+#n
+---
+# Colecciones de nodos:
+# Listas: Secuencia ORDENADA de nodos
+- 1
+- "Hola"
+- True
+---
+[1, "Hola", true] # JSON
+---
+# Mapas / Diccionarios
+# Secuencia no ordenada de nodos,
+# donde cada nodo va identificado por otro nodo
+etiqueta1: valor 1
+etiqueta2: 33
+etiqueta3: True
+## Este tipo de nodos es lo que vais a encontrar habitualmente en los ficheros YAML
+---
+etiqueta2: 33
+etiqueta1: valor 1
+etiqueta3: True
+---
+etiqueta1: valor 1
+etiqueta2: 
+    subetiqueta1: 34
+    subetiqueta2: |
+        Texto denmtro del nodo
+        Con muchas lineas
+        
+        que se entiendan literalmente
+etiqueta3:  
+            - item1
+            -   - item 1
+                - item2
+            -   - item 1.1
+                - item2.2
+            - 3

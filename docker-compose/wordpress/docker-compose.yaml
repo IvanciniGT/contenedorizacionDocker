@@ -1,0 +1,28 @@
+version: "3.5" # Indica que versión del esquema de docker-compose estamos usando.
+
+services:
+    # Aqui dentro es donde definimos los contenedores
+    mimysql: # Nombre DNS del contenedor dentro de la red de docker
+        image: mysql:5.6.51 # IMAGEN 
+        container_name: mimysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=password                         # VARIABLES DE ENTORNO: Password usuario root \
+            - MYSQL_DATABASE=curso                                 # VARIABLES DE ENTORNO: Nombre BBDD \
+            - MYSQL_USER=usuario                                   # VARIABLES DE ENTORNO: Nombre usuario \
+            - MYSQL_PASSWORD=password                              # VARIABLES DE ENTORNO: Password usuario \
+        volumes:
+            - ~/environment/datos/mysql:/var/lib/mysql             # VOLUMENES \
+            
+    miwordpress:
+        image: wordpress 
+        container_name: miwp
+        environment:
+            - WORDPRESS_DB_HOST=mimysql
+            - WORDPRESS_DB_NAME=curso
+            - WORDPRESS_DB_USER=usuario
+            - WORDPRESS_DB_PASSWORD=password
+        ports:
+            - 8081:80
+        volumes:
+            - ~/environment/datos/wp:/var/www/html
+    
