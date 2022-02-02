@@ -1,0 +1,24 @@
+
+# Para ir preparando todo... y mirar como opero con la imagen base que tengo:
+# $ docker run -it --rm --name mitomcat -u root  -e ALLOW_EMPTY_PASSWORD=yes bitnami/tomcat:latest bash                                 
+FROM bitnami/tomcat:latest
+
+# Ponermos como usuario root (o cualquier otro) en mi contenedor, desde el que voy a generar la imagen
+USER root
+
+# Instalamos el software necesario
+RUN apt-get update
+RUN apt-get install git -y
+RUN apt-get install maven -y
+
+# Nos ponemos en macha !!!
+RUN git clone https://github.com/IvanciniGT/automatizacionTesting.git /tmp/proyecto
+RUN cd /tmp/proyecto/mi-web-service && mvn package
+#RUN mvn -f /tmp/proyecto/mi-web-service/pom.xml package
+# Esto dará como resultado un fichero en /tmp/proyecto/mi-web-service/target/mi-web-service.war
+
+#RUN mv /tmp/proyecto/mi-web-service/target/mi-web-service.war /app
+COPY HOST/mi-web-service.war /app
+USER 1001
+
+VOLUME ["/app"]

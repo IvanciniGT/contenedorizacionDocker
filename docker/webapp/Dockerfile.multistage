@@ -1,0 +1,16 @@
+# BIENVENIDOS A LOS PROYECTOS DOCKERFILE MULTISTAGE !!!!!!!!
+# Ponermos como usuario root (o cualquier otro) en mi contenedor, desde el que voy a generar la imagen
+
+# FASE 1: Descargo el proyecto de git
+FROM bitnami/git:latest AS clonador
+RUN git clone https://github.com/IvanciniGT/automatizacionTesting.git /tmp/proyecto
+
+# Instalamos el software necesario
+FROM maven:3.8.4-jdk-11 AS empaquetador
+COPY --from=clonador /tmp/proyecto /miproyecto
+RUN cd /miproyecto/mi-web-service && mvn package
+
+# Desplegar la app en toomcat
+FROM bitnami/tomcat:latest
+COPY --from=empaquetador /miproyecto/mi-web-service/target/mi-web-service.war /app
+VOLUME ["/app"]
