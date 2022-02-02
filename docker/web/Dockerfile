@@ -11,7 +11,21 @@ FROM fedora:latest
 # Ejecutar comandos en el contenedor temporal desde el que se creará la imagen
 # RUN comando
 RUN yum install nginx -y
+COPY ./nginx.conf /etc/nginx/nginx.conf
+RUN yum install git -y
+RUN git clone https://github.com/IvanciniGT/webEjemploAnsible.git /web
+# RUN /bin/cp -rf /laweb/* /usr/share/nginx/html
+
+CMD ["nginx","-g","daemon off;"]
 
 # Configuraciones con valores por defecto
 
 # Info para el que le interese
+EXPOSE 81
+VOLUME ["/web"]
+LABEL VERSION_DE_MI_APP=1.17
+LABEL Otros="Este app va sin garantia de ningun tipo. Si te falla... pues es lo que hay. Buscate la vida !!!!"
+
+# Deprecated
+MAINTAINER Ivan Osuna <ivan.osuna.ayuste@gmail.com> 
+LABEL maintainer="Ivan Osuna <ivan.osuna.ayuste@gmail.com>"
