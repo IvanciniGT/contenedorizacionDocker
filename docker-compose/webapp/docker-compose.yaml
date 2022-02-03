@@ -5,7 +5,12 @@ version: "3.5"
 
 services:
     miwebapp:
-        image: webapp:1 
+        build:
+            context: .
+            args:
+                REPO_URL: https://github.com/IvanciniGT/automatizacionTesting.git
+                PROJECT_FOLDER: mi-web-service
+        image: webapp:2
         container_name: miwebapp
         volumes:
             - ~/environment/datos/webapp:/app
@@ -18,3 +23,32 @@ services:
 #docker rm $(docker ps --all -q -f)
 #docker rmi $(docker images -q)
 #docker image prune
+# Quisiera poder parametrizar el puerto en el que funciona tomcat?
+# /opt/bitnami/tomcat/conf/server.xml
+
+# Alternativas. Ventajas e inconvenientes
+# 1 - En el momento de crear la imagen. Parametro:
+#        Procedimiento:
+#           - ARG NUEVO_PUERTO
+#           - sed Editar el fichero de conf tomcat <- NUEVO_PUERTO
+#           - EXPOSE <- NUEVO_PUERTO
+#
+# 2 - En el momento de crear la imagen. Inyectar el fichero de conf
+#       Procedimiento
+#           - ARG NUEVO_PUERTO
+#           - COPIAR EL FICHERO... COPY
+#           - EXPOSE <- NUEVO_PUERTO
+#
+# A partir de aqui presuponemos que hemos generado la imagen como ahora... Con el puerto 8080
+################################################################################################
+# 3 - En el momento de crear un contenedor? SI. Cómo?  Inyectar el fichero de conf
+#       Procedimiento
+#           - VOLUMES con el fichero.. Solo el fichero
+#
+# 4 - En el momento de crear un contenedor? Parametro
+#       Parametros se llaman ya en este momento de la partida: VARIABLE DE ENTORNO
+#           - sed Editar el fichero de conf tomcat <- NUEVO_PUERTO
+#           - Antes de arrancar TOMCAT
+#               -> Nuevo script de arranque
+#
+

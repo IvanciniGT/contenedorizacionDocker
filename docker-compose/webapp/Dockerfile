@@ -6,18 +6,24 @@ FROM bitnami/git:latest AS clonador
 
 #ARG REPO_URL=https://github.com/IvanciniGT/automatizacionTesting.git
 ARG REPO_URL
+ARG PROJECT_FOLDER
 
 RUN echo Usando la url: $REPO_URL
+RUN echo Buscando el proyecto: $PROJECT_FOLDER
 RUN git clone $REPO_URL /tmp/proyecto
 
 # Instalamos el software necesario
 FROM maven:3.8.4-jdk-11 AS empaquetador
+ARG PROJECT_FOLDER
 COPY --from=clonador /tmp/proyecto /miproyecto
-RUN cd /miproyecto/mi-web-service && mvn package
+RUN cd /miproyecto/$PROJECT_FOLDER && mvn package
 
 # Desplegar la app en toomcat
 FROM bitnami/tomcat:latest
 # existe app-original?? La tendre que crear
+ARG REPO_URL
+ARG PROJECT_FOLDER
+ARG TOMCAT_PORT=8080
 
 USER root
 
@@ -30,6 +36,10 @@ RUN chmod 755 /init.sh
 VOLUME ["/app"]
 
 USER 1001
+ENV PROJECT_FOLDER=$PROJECT_FOLDER
+ENV REPO_URL=$REPO_URL
+
+EXPOSE $TOMCAT_PORT
 
 CMD ["/bin/sh","-c","/init.sh"]
 # Cuando arranque un contenedor creado desde esta imagen:
