@@ -1,0 +1,52 @@
+version: "3"
+services:
+  sonarqube:
+    image: sonarqube:community
+    container_name: misonar
+    depends_on:
+      - midb
+    restart: "no"
+    # restart: always           # Reiniciaría mi contenedor en cualquier escenario (incluso al arrancar la maquina)
+    # restart: on-failure       # Si falla no se re-arranca
+    # restart: unless-stopped   # Si no se ha parado a mano
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://midb:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      #      - sonarqube_data:/opt/sonarqube/data
+      #      - sonarqube_extensions:/opt/sonarqube/extensions
+      #      - sonarqube_logs:/opt/sonarqube/logs
+      - /home/ubuntu/environment/datos/sonar/data:/opt/sonarqube/data
+      - /home/ubuntu/environment/datos/sonar/extensions:/opt/sonarqube/extensions
+      - /home/ubuntu/environment/datos/sonar/logs:/opt/sonarqube/logs
+    ports:
+      - "8082:9000"
+  midb:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      - /home/ubuntu/environment/datos/postgresql/main:/var/lib/postgresql
+      - /home/ubuntu/environment/datos/postgresql/data:/var/lib/postgresql/data
+
+#volumes: # Estos volumenes actuan como volumenes persistentes.
+    # Si borro un contenedor, el volumen se mantiene.
+    # Donde están los datos? En una carpeta que ha creado docker... por ahi.... en su directorio 
+#  sonarqube_data:
+#  sonarqube_extensions:
+#  sonarqube_logs:
+#  postgresql:
+#  postgresql_data:
+  
+# A MI QUE LO VOY A INSTALAR ME INTERESA cuando instalo esto... 
+# que nis archivos estén controlados en una carpeta que yo conozca...
+# a la que tenga acceso... 
+# de la que pueda hacer copias y backups
+
+# Poneros el gorro de desarrollador de este fichero docker-compose...
+# Que me interesa a mi? como desarrollador de este fichero?
+# Yo soy el tio de sonarqube... montando esto para ponerlo en mi web
+# Que cualquier persona que descargue este fichero puede poner sonar en marcha
+# Sin cambiar ni una coma del fichero.

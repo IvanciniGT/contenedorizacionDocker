@@ -17,8 +17,8 @@ RUN cd /tmp/proyecto/mi-web-service && mvn package
 #RUN mvn -f /tmp/proyecto/mi-web-service/pom.xml package
 # Esto dará como resultado un fichero en /tmp/proyecto/mi-web-service/target/mi-web-service.war
 
-#RUN mv /tmp/proyecto/mi-web-service/target/mi-web-service.war /app
-COPY HOST/mi-web-service.war /app
+RUN mv /tmp/proyecto/mi-web-service/target/mi-web-service.war /app
+#COPY HOST/mi-web-service.war /app
 USER 1001
 
 VOLUME ["/app"]

@@ -98,3 +98,10 @@ etiqueta3:
             -   - item 1.1
                 - item2.2
             - 3
+---
+lista:
+- 1
+- 2
+mapa:
+                            item1: valor1
+                            item2: valor1

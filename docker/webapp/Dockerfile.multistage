@@ -12,5 +12,29 @@ RUN cd /miproyecto/mi-web-service && mvn package
 
 # Desplegar la app en toomcat
 FROM bitnami/tomcat:latest
-COPY --from=empaquetador /miproyecto/mi-web-service/target/mi-web-service.war /app
+# existe app-original?? La tendre que crear
+
+USER root
+
+RUN mkdir -p /app-original
+COPY --from=empaquetador /miproyecto/mi-web-service/target/mi-web-service.war /app-original
+RUN chmod 755 -R /app-original
+
+COPY ./init.sh /
+RUN chmod 755 /init.sh
 VOLUME ["/app"]
+
+USER 1001
+
+CMD ["/bin/sh","-c","/init.sh"]
+# Cuando arranque un contenedor creado desde esta imagen:
+# [ -z "$(ls carpeta)" ]
+# 1 Mirar si la carpeta app esta vacia. 1ª ejecucion
+#       -> Cargamos ahi nuestra app
+# 2 No esta vacia... Dejamos lo que hay
+
+# CAMBIOS:
+# CMD: que implemente la logica de arriba.. Y despues de esa lógica que hará el comando?
+    # Lanzar el tomcat con el script de bitnami
+
+# Crear ese script
