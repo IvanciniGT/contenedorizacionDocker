@@ -1,0 +1,629 @@
+version: '3.5'
+services:
+
+
+# 2 nodos maestros
+# 2 nodos datos + votacion
+# 2 nodos ingesta
+# 1 nodos coordinacion 
+
+
+  maestro1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: maestro1
+    environment:
+      - node.name=maestro1
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - cluster.initial_master_nodes=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=true
+      - node.voting_only=false
+      - node.data=false
+      - node.ingest=false
+      #- node.remote_cluster_client=false  # 
+      - cluster.remote.connect=false 
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial #basic
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/maestro1.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/maestro1.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/maestro1.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/maestro1.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+      - certmaestro1:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+  maestro2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: maestro2
+    environment:
+      - node.name=maestro2
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - cluster.initial_master_nodes=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=true
+      - node.voting_only=false
+      - node.data=false
+      - node.ingest=false
+      # - node.remote_cluster_client=false  # 
+      - cluster.remote.connect=false 
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/maestro2.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/maestro2.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/maestro2.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/maestro2.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+      - certmaestro2:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+  data1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: data1
+    environment:
+      - node.name=data1
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - cluster.initial_master_nodes=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=true
+      - node.voting_only=true
+      - node.data=true
+      - node.ingest=false
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/data1.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data1.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data1.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/data1.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+      - certdata1:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+  data2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: data2
+    environment:
+      - node.name=data2
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1,data3,data4
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=true
+      - node.ingest=false
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/data2.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data2.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data2.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/data2.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data04:/usr/share/elasticsearch/data
+      - certdata2:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+  data3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: data3
+    environment:
+      - node.name=data3
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=true
+      - node.ingest=false
+      - node.attr.color=azul
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/data3.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data3.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data3.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/data3.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data08:/usr/share/elasticsearch/data
+      - certdata3:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+
+  data4:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: data4
+    environment:
+      - node.name=data4
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=true
+      - node.ingest=false
+      - node.attr.color=azul
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/data4.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data4.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/data4.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/data4.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data09:/usr/share/elasticsearch/data
+      - certdata4:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+
+  ingesta1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: ingesta1
+    environment:
+      - node.name=ingesta1
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=false
+      - node.ingest=true
+      - transport.host=_eth0_
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/ingesta1.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/ingesta1.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/ingesta1.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/ingesta1.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data05:/usr/share/elasticsearch/data
+      - certingesta1:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+
+  ingesta2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: ingesta2
+    environment:
+      - node.name=ingesta2
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=false
+      - node.ingest=true
+      - transport.host=_eth0_
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/ingesta2.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/ingesta2.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/ingesta2.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/ingesta2.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data06:/usr/share/elasticsearch/data
+      - certingesta2:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet # eth0
+      - frontnet # eth1
+
+  coordinador1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: coordinador1
+    environment:
+      - node.name=coordinador1
+      - cluster.name=cluster-es
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=maestro1,maestro2,data1,data2,ingesta1,ingesta2,coordinador1
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.master=false
+      - node.voting_only=false
+      - node.data=false
+      - node.ingest=false
+      - transport.host=_eth0_
+      #- node.remote_cluster_client=false  #
+      - cluster.remote.connect=false 
+
+
+      - cluster.join.timeout=180s
+      - cluster.publish.timeout=180s
+      - xpack.license.self_generated.type=trial 
+      - ELASTIC_PASSWORD=password 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true #SSL1
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/own/coordinador1.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/coordinador1.crt
+      - xpack.security.transport.ssl.enabled=true #SSL2
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/own/coordinador1.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/own/coordinador1.key
+      - cluster.routing.allocation.disk.threshold_enabled=false
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data07:/usr/share/elasticsearch/data
+      - certcoordinador1:/usr/share/elasticsearch/config/certificates/own
+      - cadrive:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+
+  cerebro:
+    image: lmenezes/cerebro:0.8.5
+    container_name: cerebro
+    volumes:
+      - ./application.conf:/opt/cerebro/conf/application.conf
+      - cadrive:/opt/cerebro/ca
+    networks:
+      - frontnet
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.2
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: "https://coordinador1:9200"
+      SERVER_NAME: "kibana"
+      SERVER_HOST: "kibana"
+      ELASTICSEARCH_USERNAME: "elastic"
+      ELASTICSEARCH_PASSWORD: "password"
+      ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES:  "/etc/kibana/config/certs/ca/ca.crt" 
+      SERVER_SSL_ENABLED: "false"
+      SERVER_SSL_CERTIFICATE: "/etc/kibana/config/certs/kibana/kibana.crt"
+      SERVER_SSL_KEY: "/etc/kibana/config/certs/kibana/kibana.key"
+    networks:
+      - frontnet
+    volumes:
+      - certkibana:/etc/kibana/config/certs/kibana
+      - cadrive:/etc/kibana/config/certs/ca
+
+  nginx: 
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx_error.log:/etc/nginx/error_log.log
+    ports:
+      - 8080:8080
+      - 8081:8081
+      - 8082:8082
+    networks:
+      - frontnet
+      - publicnet
+
+
+
+  create_certs:
+    container_name: create_certs
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    command: >
+      bash -c '
+        if [[ ! -f /certs/bundle.zip ]]; then
+          bin/elasticsearch-certutil cert --silent --pem --in config/certificates/instances.yml -out /certs/bundle.zip;
+          chown -R 1000:0 /certs
+        fi
+      '
+    user: "0"
+    working_dir: /usr/share/elasticsearch
+    volumes: 
+      - 'certsroot:/certs'
+      - '.:/usr/share/elasticsearch/config/certificates'
+
+
+volumes:
+  data01:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data01'
+  data02:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data02'
+  data03:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data03'
+  data04:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data04'
+  data05:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data05'
+  data06:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data06'
+  data07:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data07'
+  data08:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data08'
+  data09:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/data09'
+
+
+  certsroot:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs'
+  cadrive:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/ca'
+  certkibana:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/kibana'
+  certmaestro1:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/maestro1'
+  certmaestro2:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/maestro2'
+  certingesta1:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/ingesta1'
+  certingesta2:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/ingesta2'
+  certdata1:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/data1'
+  certdata2:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/data2'
+  certdata3:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/data3'
+  certdata4:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/data4'
+  certcoordinador1:
+    driver: local #overlay
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/var/elasticsearch/certs/coordinador1'
+
+
+
+      
+networks:
+  backnet:
+    ipam:
+      driver: default #overlay
+      config:
+        - subnet: 10.10.0.0/8
+
+  frontnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 20.10.0.0/8
+
+  publicnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 30.10.0.0/8

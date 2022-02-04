@@ -14,15 +14,17 @@ services:
         container_name: miwebapp
         volumes:
             - ~/environment/datos/webapp:/app
-            
+            - $PWD/configuracionMiTomcat.xml:/opt/bitnami/tomcat/conf/server.xml
         ports:
-            - 8080:8080
+            - 8080:8098
         environment:
             ALLOW_EMPTY_PASSWORD: "yes"
+            TOMCAT_PORT: 8090
 
-#docker rm $(docker ps --all -q -f)
+#docker rm $(docker ps --all -q ) -f
 #docker rmi $(docker images -q)
 #docker image prune
+
 # Quisiera poder parametrizar el puerto en el que funciona tomcat?
 # /opt/bitnami/tomcat/conf/server.xml
 
@@ -44,7 +46,8 @@ services:
 # 3 - En el momento de crear un contenedor? SI. Cómo?  Inyectar el fichero de conf
 #       Procedimiento
 #           - VOLUMES con el fichero.. Solo el fichero
-#
+#               NO ME IMPLICA TRABAJO NINGUNO A MI DESARROLLADOR DE LA IMAGEN
+#               USADOR DE LA IMAGEN: Montar un fichero como volumen    
 # 4 - En el momento de crear un contenedor? Parametro
 #       Parametros se llaman ya en este momento de la partida: VARIABLE DE ENTORNO
 #           - sed Editar el fichero de conf tomcat <- NUEVO_PUERTO

@@ -12,7 +12,19 @@ services:
             - MYSQL_PASSWORD=password                              # VARIABLES DE ENTORNO: Password usuario \
         volumes:
             - ~/environment/datos/mysql:/var/lib/mysql             # VOLUMENES \
-            
+        deploy:
+            resources:
+                limits:
+                    cpus: 2
+                    memory: 4 Gbs
+                reservations:
+                    cpus: 1
+                    memory: 3 Gbs
+        # docker-compose up --compatibility < Me permite usar esta sintaxis sin correr en swarm
+        # Disponible en version 2 del esquema YAML de docker compose                    
+        # mem_limit:
+        # mem_reservation:
+        # cpus:
     miwordpress:
         image: wordpress 
         container_name: miwp
@@ -25,4 +37,5 @@ services:
             - 8081:80
         volumes:
             - ~/environment/datos/wp:/var/www/html
-    
+
+# 172.17.0.0/16    
